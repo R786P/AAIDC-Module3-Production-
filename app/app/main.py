@@ -5,7 +5,7 @@ from crewai import Crew
 from .agents import researcher, writer, reviewer
 from .tasks import create_tasks
 
-app = FastAPI(title="AI Project Analyzer")
+app = FastAPI(title="Repo_AI_Agent")
 templates = Jinja2Templates(directory="app/templates")
 
 @app.get("/", response_class=HTMLResponse)
