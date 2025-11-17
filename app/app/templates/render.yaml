@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: module3-agent
+    name: Repo_AI_Agent
     env: python
     region: oregon
     buildCommand: "pip install -r requirements.txt"
