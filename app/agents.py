@@ -1,8 +1,7 @@
 from crewai import Agent
-from crewai_tools import BaseTool
 from langchain_groq import ChatGroq
 import os
-from tavily import TavilyClient
+from crewai_tools import TavilyTool 
 
 # LLM Setup
 llm = ChatGroq(
@@ -10,23 +9,15 @@ llm = ChatGroq(
     model="llama3-8b-8192"
 )
 
-# Tavily client initialization
-tavily = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
-
-# Tool ko BaseTool class se define kiya gaya hai
-class TavilySearchTool(BaseTool):
-    name = "Tavily Web Search Tool"
-    description = "Useful for searching the web for up-to-date information."
-    
-    def _run(self, query: str) -> str:
-        return tavily.search(query, search_depth="advanced")["answer"]
+# Tools Definition
+tavily_search_tool = TavilyTool(api_key=os.getenv("TAVILY_API_KEY"))
 
 # Agents Definition
 researcher = Agent(
     role="Senior Researcher",
     goal="Find relevant info about the GitHub project",
     backstory="Expert in web research with 10+ years of experience",
-    tools=[TavilySearchTool()], 
+    tools=[tavily_search_tool], 
     llm=llm,
     verbose=True
 )
