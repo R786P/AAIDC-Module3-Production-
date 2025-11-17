@@ -7,3 +7,6 @@ tavily-python
 groq
 jinja2
 python-dotenv
+langchain
+langchain-groq
+python-dotenv
