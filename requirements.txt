@@ -10,3 +10,4 @@ python-dotenv
 langchain
 langchain-groq
 python-dotenv
+crewai_tools
