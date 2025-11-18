@@ -19,7 +19,7 @@ async def analyze(request: Request, repo_url: str = Form(...)):
         crew = Crew(
             agents=[researcher, writer, reviewer],
             tasks=tasks,
-            verbose=2
+            verbose=True
         )
         result = crew.kickoff()
         return templates.TemplateResponse("index.html", {
