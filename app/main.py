@@ -6,7 +6,7 @@ from .agents import researcher, writer, reviewer
 from .tasks import create_tasks
 
 app = FastAPI(title="Repo_AI_Agent")
-templates = Jinja2Templates(directory="app/templates")
+templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
