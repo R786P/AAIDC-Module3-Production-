@@ -1,9 +1,0 @@
-fastapi
-uvicorn
-crewai
-langchain
-langchain-community
-tavily-python
-groq
-jinja2
-python-dotenv
