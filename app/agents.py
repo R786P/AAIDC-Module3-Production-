@@ -1,44 +1,45 @@
 from crewai import Agent
-from langchain_groq import ChatGroq
+from langchain_groq import ChatGroq # ✅ Groq Import kiya
+from tools.tavily_search import tavily_search_tool
 import os
-# Saare crewai tools yahaan se aate hain, aur hum TavilyTool use karenge
-from crewai_tools import TavilySearchTool 
-from langchain_community.tools import tool
 
-# LLM Setup (Groq - Free)
-llm = ChatGroq(
-    api_key=os.getenv("GROQ_API_KEY"),
-    model='gpt-3.5-turbo'
+# Ensure GROQ_API_KEY is available in Render environment variables
+if 'GROQ_API_KEY' not in os.environ:
+    raise ValueError("GROQ_API_KEY environment variable not set.")
+
+# Groq LLM configuration
+groq_llm = ChatGroq(
+    temperature=0.7,
+    # Groq ka ek tez aur accha model
+    model="mixtral-8x7b-32768", 
 )
 
-# Tools Definition (Tavily - Standard CrewAI/Langchain Tool)
-# TavilySearchTool ko is tarah initialize kariye
-tavily_search_tool = TavilySearchTool(
-    tavily_api_key=os.getenv("TAVILY_API_KEY")
-)
+# --- AGENT DEFINITIONS ---
 
-# Agents
 researcher = Agent(
-    role="Senior Researcher",
-    goal="Find relevant info about the GitHub project",
-    backstory="Expert in web research with 10+ years of experience",
-    tools=[tavily_search_tool], # <-- Ab yeh BaseTool instance hai
-    llm=llm,
-    verbose=True
+    role='Software Analyst',
+    goal='Provide verified and actionable suggestions to improve the project repository.',
+    backstory='You are a leading expert in software analysis and code quality, skilled at evaluating project structures, documentation, and dependencies.',
+    llm=groq_llm, # ✅ Groq LLM use ho raha hai
+    tools=[tavily_search_tool],
+    verbose=True,
+    allow_delegation=False
 )
 
 writer = Agent(
-    role="Content Writer",
-    goal="Suggest improvements for the project",
-    backstory="Writes clear, actionable, and user-friendly suggestions",
-    llm=llm,
-    verbose=True
+    role='Professional Technical Writer',
+    goal='Format the analysis findings into a professional, clear, and easy-to-read Markdown report.',
+    backstory='You are an expert technical writer known for creating compelling and actionable reports that guide software teams.',
+    llm=groq_llm, # ✅ Groq LLM use ho raha hai
+    verbose=True,
+    allow_delegation=False
 )
 
 reviewer = Agent(
-    role="Quality Reviewer",
-    goal="Validate suggestions against facts",
-    backstory="Ensures accuracy, relevance, and professionalism",
-    llm=llm,
-    verbose=True
+    role='Quality Assurance Specialist',
+    goal='Review the final report for correctness, clarity, and ensure all suggestions are actionable and accurate.',
+    backstory='You are a meticulous QA specialist with an eye for detail, ensuring no errors slip into the final report.',
+    llm=groq_llm, # ✅ Groq LLM use ho raha hai
+    verbose=True,
+    allow_delegation=False
 )
