@@ -1,24 +1,26 @@
 from crewai import Agent
 from langchain_groq import ChatGroq
 import os
-from crewai_tools import TavilySearchTool # <-- Yeh import use karein
 
-# LLM Setup
+# LLM Setup (Groq - Free)
 llm = ChatGroq(
     api_key=os.getenv("GROQ_API_KEY"),
     model="llama3-8b-8192"
 )
 
-# Tools Definition
-# TavilySearchTool ko seedhe initialize kiya gaya hai
-tavily_tool = TavilySearchTool(tavily_api_key=os.getenv("TAVILY_API_KEY"))
+# Tools (Tavily - free web search)
+from tavily import TavilyClient
+tavily = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
-# Agents Definition
+def tavily_search(query: str) -> str:
+    return tavily.search(query, search_depth="advanced")["answer"]
+
+# Agents
 researcher = Agent(
     role="Senior Researcher",
     goal="Find relevant info about the GitHub project",
     backstory="Expert in web research with 10+ years of experience",
-    tools=[tavily_tool], # Tool object ko pass kiya
+    tools=[tavily_search],
     llm=llm,
     verbose=True
 )
