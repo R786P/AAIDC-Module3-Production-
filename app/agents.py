@@ -9,7 +9,7 @@ if 'GROQ_API_KEY' not in os.environ:
 # Using Llama 3 on Groq (assuming the last model was 'llama3-8b-8192')
 groq_llm = ChatGroq(
     temperature=0.6, # Thoda kam temperature, taki less creative ho
-    model="llama3-8b-8192", 
+    model="gemma-7b-it", 
 )
 
 # --- AGENT DEFINITIONS ---
