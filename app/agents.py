@@ -8,7 +8,7 @@ if 'GROQ_API_KEY' not in os.environ:
 
 groq_llm = ChatGroq(
     temperature=0.7,
-    model="mixtral-8x7b-32768", 
+    model = "llama3-8b-8192", 
 )
 
 # --- AGENT DEFINITIONS ---
