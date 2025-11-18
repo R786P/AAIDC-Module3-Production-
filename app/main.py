@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from crewai import Crew
 import os
 
-templates = Jinja2Templates(directory="app/app/templates/tools")
+templates = Jinja2Templates(directory="app/templates/tools")
 
 # Import agents and tasks from the app package
 from .agents import researcher, reviewer, writer
