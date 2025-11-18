@@ -11,3 +11,4 @@ langchain
 langchain-groq
 python-dotenv
 crewai_tools
+open_ai_tools
