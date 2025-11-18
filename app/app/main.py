@@ -2,35 +2,44 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from crewai import Crew
-from .agents import researcher, writer, reviewer
+import os
+
+templates = Jinja2Templates(directory="app/app/templates")
+
+from .agents import researcher, reviewer, writer
 from .tasks import create_tasks
 
-# ✅ App ka naam "app" hona chahiye
-app = FastAPI(title="AI Project Analyzer")
-templates = Jinja2Templates(directory="app/app/templates")
+app = FastAPI()
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/analyze", response_class=HTMLResponse)
-async def analyze(request: Request, repo_url: str = Form(...)):
+async def analyze_project(request: Request, repository_url: str = Form(...)):
+    
+    context = {"request": request, "repository_url": repository_url}
+    
     try:
-        tasks = create_tasks(repo_url)
-        crew = Crew(
+        tasks = create_tasks(repository_url)
+        
+        project_crew = Crew(
             agents=[researcher, writer, reviewer],
             tasks=tasks,
-            verbose=True
+            verbose=True, 
         )
-        result = crew.kickoff()
-        return templates.TemplateResponse("index.html", {
-            "request": request,
-            "result": str(result),
-            "repo_url": repo_url
-        })
+
+        analysis_result = project_crew.kickoff()
+        
+        context["output"] = analysis_result
+        
     except Exception as e:
-        return templates.TemplateResponse("index.html", {
-            "request": request,
-            "error": f"❌ Error: {str(e)}",
-            "repo_url": repo_url
-        })
+        error_message = f"An error occurred: {str(e)}"
+        
+        if "insufficient_quota" in str(e).lower():
+            error_message = "Error: API Quota Exceeded. Please check your OpenAI billing or switch to a different LLM (like Groq or Gemini) in agents.py."
+        
+        context["error_message"] = error_message
+        context["output"] = None
+
+    return templates.TemplateResponse("index.html", context)
