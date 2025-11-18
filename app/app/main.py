@@ -7,7 +7,7 @@ from .tasks import create_tasks
 
 # ✅ App ka naam "app" hona chahiye
 app = FastAPI(title="AI Project Analyzer")
-templates = Jinja2Templates(directory="app/templates")
+templates = Jinja2Templates(directory="app/app/templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
