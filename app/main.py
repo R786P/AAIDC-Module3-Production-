@@ -6,7 +6,7 @@ from app.agents import researcher, writer, reviewer  # ✅ Fixed import
 from app.tasks import create_tasks                   # ✅ Fixed import
 
 app = FastAPI(title="AI Project Analyzer")
-templates = Jinja2Templates(directory="app/app/template")
+templates = Jinja2Templates(directory="app/template")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
