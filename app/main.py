@@ -5,7 +5,7 @@ from crewai import Crew
 import os
 
 # Templates folder ab 'app/templates' mein hai
-templates = Jinja2Templates(directory="app/templates")
+templates = Jinja2Templates(directory="app/app/templates")
 
 # Agents aur tasks ko app package se import karein
 from .agents import researcher, reviewer, writer # Directory Fix: .agents se import
