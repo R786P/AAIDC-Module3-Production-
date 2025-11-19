@@ -10,3 +10,4 @@ jinja2
 python-dotenv
 crewai-tools
 tavily_search_tool
+requests
