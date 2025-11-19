@@ -1,16 +1,24 @@
+# Research, Writing, aur Review ke liye CrewAI Agents ko define karta hai.
+
 from crewai import Agent
 from langchain_groq import ChatGroq
-from .tools.tavily_search import tavily_search_tool # Directory Fix: .tools se import
+# 🛑 FIX: Ab Absolute Import use karein taki Render par ModuleNotFoundError na aaye
+from app.tools.tavily_search import TavilySearchResults
 import os
 
 # --- LLM CONFIGURATION ---
 if 'GROQ_API_KEY' not in os.environ:
+    # यह चेक यहीं पर रहेगा
     raise ValueError("GROQ_API_KEY environment variable not set.")
 
 groq_llm = ChatGroq(
     temperature=0.6,
-    model="llama2-70b-4096", # Stable Groq model use karein
+    model="llama2-70b-4096",
 )
+
+# --- TOOL INSTANTIATION ---
+# TavilySearchResults Class ka instance yahan banaya gaya hai
+tavily_search_tool = TavilySearchResults(name="Tavily Search")
 
 # --- AGENT DEFINITIONS ---
 researcher = Agent(
@@ -19,10 +27,11 @@ researcher = Agent(
     backstory=(
         "You are a leading expert in software architecture and code quality. "
         "Your responses must **ALWAYS** be delivered in a **highly professional, formal, and objective tone**. "
+        "Never use casual, friendly, or conversational language. "
         "You **MUST** use the Tavily Search Tool to verify all dependencies and latest practices before reporting."
     ),
     llm=groq_llm,
-    tools=[tavily_search_tool], # Tavily tool add kiya
+    tools=[tavily_search_tool], 
     verbose=True,
     allow_delegation=False
 )
@@ -32,7 +41,8 @@ writer = Agent(
     goal='Format the analysis findings into a highly professional, clear, and easy-to-read Markdown report.',
     backstory=(
         "You are an expert technical writer known for creating compelling and actionable reports. "
-        "Maintain a **formal, objective, and professional tone** throughout the final report."
+        "Maintain a **formal, objective, and professional tone** throughout the final report. "
+        "Ensure the final document is well-structured and free of any casual dialogue."
     ),
     llm=groq_llm,
     verbose=True,
