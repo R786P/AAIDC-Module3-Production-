@@ -1,62 +1,42 @@
-# Research, Writing, aur Review ke liye CrewAI Agents ko define karta hai.
-
 from crewai import Agent
 from langchain_groq import ChatGroq
-# 🛑 FIX: Ab Absolute Import use karein taki Render par ModuleNotFoundError na aaye
-from app.tools.tavily_search import TavilySearchResults
 import os
 
-# --- LLM CONFIGURATION ---
-if 'GROQ_API_KEY' not in os.environ:
-    # यह चेक यहीं पर रहेगा
-    raise ValueError("GROQ_API_KEY environment variable not set.")
-
-groq_llm = ChatGroq(
-    temperature=0.6,
-    model="llama2-70b-4096",
+# LLM Setup (Groq - Free)
+llm = ChatGroq(
+    api_key=os.getenv("GROQ_API_KEY"),
+    model="llama3-8b-8192"
 )
 
-# --- TOOL INSTANTIATION ---
-# TavilySearchResults Class ka instance yahan banaya gaya hai
-tavily_search_tool = TavilySearchResults(name="Tavily Search")
+# Tools (Tavily - free web search)
+from tavily import TavilyClient
+tavily = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
-# --- AGENT DEFINITIONS ---
+def tavily_search(query: str) -> str:
+    return tavily.search(query, search_depth="advanced")["answer"]
+
+# Agents
 researcher = Agent(
-    role='Elite Senior Software Analyst and Code Quality Expert', 
-    goal='Provide verified, actionable, professional, and formal suggestions to improve the project repository.',
-    backstory=(
-        "You are a leading expert in software architecture and code quality. "
-        "Your responses must **ALWAYS** be delivered in a **highly professional, formal, and objective tone**. "
-        "Never use casual, friendly, or conversational language. "
-        "You **MUST** use the Tavily Search Tool to verify all dependencies and latest practices before reporting."
-    ),
-    llm=groq_llm,
-    tools=[tavily_search_tool], 
-    verbose=True,
-    allow_delegation=False
+    role="Senior Researcher",
+    goal="Find relevant info about the GitHub project",
+    backstory="Expert in web research with 10+ years of experience",
+    tools=[tavily_search],
+    llm=llm,
+    verbose=True
 )
 
 writer = Agent(
-    role='Professional Technical Writer and Report Editor',
-    goal='Format the analysis findings into a highly professional, clear, and easy-to-read Markdown report.',
-    backstory=(
-        "You are an expert technical writer known for creating compelling and actionable reports. "
-        "Maintain a **formal, objective, and professional tone** throughout the final report. "
-        "Ensure the final document is well-structured and free of any casual dialogue."
-    ),
-    llm=groq_llm,
-    verbose=True,
-    allow_delegation=False
+    role="Content Writer",
+    goal="Suggest improvements for the project",
+    backstory="Writes clear, actionable suggestions",
+    llm=llm,
+    verbose=True
 )
 
 reviewer = Agent(
-    role='Quality Assurance Specialist',
-    goal='Review the final report for correctness, clarity, and ensure all suggestions are actionable and accurate.',
-    backstory=(
-        "You are a meticulous QA specialist with an eye for detail, ensuring no errors slip into the final report. "
-        "Your final check must confirm that the report's tone is **strictly professional and formal**."
-    ),
-    llm=groq_llm,
-    verbose=True,
-    allow_delegation=False
+    role="Quality Reviewer",
+    goal="Validate suggestions against facts",
+    backstory="Ensures accuracy and relevance",
+    llm=llm,
+    verbose=True
 )
