@@ -2,47 +2,34 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from crewai import Crew
-import os
+from app.agents import researcher, writer, reviewer  # ✅ Fixed import
+from app.tasks import create_tasks                   # ✅ Fixed import
 
-# Templates folder ab 'app/templates' mein hai
-templates = Jinja2Templates(directory="app/app/templates")
-
-# Agents aur tasks ko app package se import karein
-from .agents import researcher, reviewer, writer # Directory Fix: .agents se import
-from .tasks import create_tasks # tasks.py ko bhi app/ mein hona chahiye
-
-app = FastAPI()
+app = FastAPI(title="AI Project Analyzer")
+templates = Jinja2Templates(directory="app/templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    """Serve the index.html page."""
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/analyze", response_class=HTMLResponse)
-async def analyze_project(request: Request, repository_url: str = Form(...)):
-    """Handle form submission and run the AI Crew."""
-    
-    context = {"request": request, "repository_url": repository_url}
-    
+async def analyze(request: Request, repo_url: str = Form(...)):
     try:
-        tasks = create_tasks(repository_url)
-        
-        project_crew = Crew(
+        tasks = create_tasks(repo_url)
+        crew = Crew(
             agents=[researcher, writer, reviewer],
             tasks=tasks,
-            verbose=True, # VERBOSE FIX
+            verbose=2
         )
-
-        analysis_result = project_crew.kickoff()
-        context["output"] = analysis_result
-        
+        result = crew.kickoff()
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "result": str(result),
+            "repo_url": repo_url
+        })
     except Exception as e:
-        error_message = f"An error occurred: {str(e)}"
-        
-        if "quota" in str(e).lower() or "not found" in str(e).lower():
-            error_message = f"Error: LLM/API issue: {str(e)}. Check GROQ_API_KEY and model name."
-        
-        context["error_message"] = error_message
-        context["output"] = None
-
-    return templates.TemplateResponse("index.html", context)
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "error": f"❌ Error: {str(e)}",
+            "repo_url": repo_url
+        })
