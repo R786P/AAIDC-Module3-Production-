@@ -24,8 +24,8 @@ researcher = Agent(
 
 writer = Agent(
     role="Content Writer",
-    goal="Suggest improvements for the project",
-    backstory="Writes clear, actionable suggestions",
+    goal="सुझाव हिंदी में दें",
+    backstory="आप हिंदी में स्पष्ट और क्रियाशील सुझाव लिखते हैं",
     llm=llm,
     verbose=True
 )
