@@ -1,4 +1,4 @@
-from crewai_tools import BaseTool
+from crewai_tools import Tool
 import requests
 from urllib.parse import urlparse
 
