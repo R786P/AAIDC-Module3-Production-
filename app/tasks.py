@@ -4,57 +4,74 @@ from .agents import researcher, writer, reviewer
 def create_tasks(repository_url: str):
     """
     GitHub repository URL ke liye CrewAI tasks banata hai.
+    Sabhi output Hindi mein hoga, lekin technical terms English mein rahenge.
     """
     
-    # 1. Research Task: Researcher agent ke liye
+    # 1. Research Task: Researcher agent ke liye (Hindi mein sochega)
     research_task = Task(
         description=f"""
         GitHub repository URL: {repository_url} ka complete analysis kariye.
         
         Aapko yeh areas cover karne hain:
-        1. Technology Stack Analysis: Dekhiye ki project mein kaun-kaun si programming languages, frameworks, aur libraries (dependencies) use ho rahi hain.
-        2. Code Quality and Best Practices: Code structure, maintainability, aur security vulnerabilities ko check kariye.
-        3. Project Health and Activity: Dekhiye ki project kitna active hai (recent commits, issues, pull requests).
-        4. Actionable Suggestions: Kum se kum teen (3) practical aur professional suggestions dijiye jisse project ki performance, code quality, ya security immediately improve ho sake. 
+        1. **Technology Stack Analysis**: Project mein use hui programming languages, frameworks, aur libraries (jaise dependencies) identify kariye.
+        2. **Code Quality & Best Practices**: Code structure, maintainability, aur security vulnerabilities check kariye.
+        3. **Project Health**: Recent commits, issues, aur pull requests dekhein — project kitna active hai.
+        4. **Actionable Suggestions**: Kum se kum 3 practical suggestions dijiye jisse project improve ho sake.
         
-        Hamesha Tavily Tool ka use karke latest industry standards ko verify kariye.
-        """,
-        expected_output="Project ka detailed analysis, teen (3) verified, actionable, aur professional suggestions ke saath. Output sirf technical aur objective tone mein hona chahiye.",
-        agent=researcher,
-    )
-
-    # 2. Writing Task: Writer agent ke liye
-    writing_task = Task(
-        description="""
-        Researcher ke detailed analysis aur suggestions ko leke, ek final, polished technical report banaiye.
-        
-        Report ko ek single, professional Markdown document mein format kariye.
-        - Report mein koi bhi casual ya conversational language nahi honi chahiye.
-        - Structure: Title, Introduction, Detailed Analysis Findings, aur Actionable Suggestions (Bullet points mein).
+        Hamesha **Tavily Tool** ka use karke latest industry standards verify kariye.
         """,
         expected_output="""
-        Ek complete, well-formatted Markdown report jismein detailed analysis aur actionable suggestions hain.
-        Report ka tone hamesha professional aur formal hona chahiye.
+        Ek detailed analysis report jo **Hindi mein likha gaya ho**, lekin **technical terms (jaise Python, FAISS, Groq) English mein rahein**.
+        Output mein 3 verified suggestions hona chahiye — clear, actionable, aur professional tone mein.
+        """,
+        agent=researcher,
+        output_file="research_output_hindi.md"
+    )
+
+    # 2. Writing Task: Writer agent (Hindi report banayega)
+    writing_task = Task(
+        description="""
+        Researcher ke Hindi analysis ko lekar ek final, polished technical report banaiye.
+        
+        Guidelines:
+        - **Pura report Hindi mein hona chahiye**, lekin **technical shabdon ko English mein rakhein** (jaise: "README file", "API key", "vector database").
+        - Report structure:
+          * **शीर्षक (Title)**
+          * **परिचय (Introduction)**
+          * **विश्लेषण निष्कर्ष (Analysis Findings)**
+          * **क्रियान्वयन योग्य सुझाव (Actionable Suggestions)** → bullet points mein
+        - Bhasha sadharan, spasht aur vyavsayik (professional) honi chahiye.
+        """,
+        expected_output="""
+        Ek complete Markdown report jo **Hindi mein ho**, lekin **technical terms English mein ho**.
+        Report formal, clear aur client-ready hona chahiye.
         """,
         agent=writer,
         context=[research_task],
+        output_file="final_report_hindi.md"
     )
     
-    # 3. Review Task: Reviewer agent ke liye
+    # 3. Review Task: Reviewer agent (Hindi report ko verify karega)
     review_task = Task(
         description="""
-        Writer dwara banaye gaye final report ko review kariye.
+        Writer dwara banaye gaye Hindi report ko final review kariye.
         
-        Aapko yeh confirm karna hai:
-        1. Tone aur Professionalism: Poori report ka tone strictly professional aur formal hai.
-        2. Clarity aur Correctness: Saari technical details aur suggestions sahi aur samajhne mein aasan hain.
-        3. Completion: Report mein saare zaroori sections (Analysis, Suggestions) shamil hain.
+        Check karein:
+        1. **Bhasha**: Kya report sahi Hindi mein hai? Kya kahi koi English sentence galti se nahi likha gaya?
+        2. **Technical Accuracy**: Kya technical terms sahi tareeke se English mein hain?
+        3. **Professionalism**: Kya tone formal aur client-ready hai?
+        4. **Completeness**: Kya sab sections present hain?
         
-        Agar koi bhi correction zaroori ho, to report ko theek karke final, ready-to-present version dijiye.
+        Agar koi galti ho, toh usse sudhar kar ek final, ready-to-deliver version taiyaar karein.
         """,
-        expected_output="Final, error-free, aur professional-toned technical Markdown report, jo seedhe client ko bheja jaa sake. Koi bhi extra text ya commentary shamil na karein.",
+        expected_output="""
+        Ek final, error-free Hindi technical report jo seedhe client ko bheja ja sake.
+        Report **Hindi mein hoga**, lekin **technical terms (jaise GitHub, LLM, API) English mein honge**.
+        Koi bhi extra commentary nahi hoga — sirf report.
+        """,
         agent=reviewer,
         context=[writing_task],
+        output_file="reviewed_final_report_hindi.md"
     )
     
     return [research_task, writing_task, review_task]
