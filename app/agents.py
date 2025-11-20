@@ -13,6 +13,7 @@ from crewai_tools import TavilySearchTool
 tavily_tool = TavilySearchTool()
 
 # Agents
+from .tools import read_github_readme  # New tool
 researcher = Agent(
     role="Senior Researcher",
     goal="Analyze the actual GitHub repo content AND find similar projects",
