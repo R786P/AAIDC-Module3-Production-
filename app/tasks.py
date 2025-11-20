@@ -1,31 +1,17 @@
 from crewai import Task
 from .agents import researcher, writer, reviewer
-
-def create_tasks(repository_url: str):
-    """
-    GitHub repository URL ke liye CrewAI tasks banata hai.
-    Sabhi output Hindi mein hoga, lekin technical terms English mein rahenge.
-    """
-    
-    # 1. Research Task: Researcher agent ke liye (Hindi mein sochega)
+  def create_tasks(repo_url: str):
     research_task = Task(
         description=f"""
-        GitHub repository URL: {repository_url} ka complete analysis kariye.
-        
-        Aapko yeh areas cover karne hain:
-        1. **Technology Stack Analysis**: Project mein use hui programming languages, frameworks, aur libraries (jaise dependencies) identify kariye.
-        2. **Code Quality & Best Practices**: Code structure, maintainability, aur security vulnerabilities check kariye.
-        3. **Project Health**: Recent commits, issues, aur pull requests dekhein — project kitna active hai.
-        4. **Actionable Suggestions**: Kum se kum 3 practical suggestions dijiye jisse project improve ho sake.
-        
-        Hamesha **Tavily Tool** ka use karke latest industry standards verify kariye.
-        """,
-        expected_output="""
-        Ek detailed analysis report jo **Hindi mein likha gaya ho**, lekin **technical terms (jaise Python, FAISS, Groq) English mein rahein**.
-        Output mein 3 verified suggestions hona chahiye — clear, actionable, aur professional tone mein.
+        Step 1: Read the actual GitHub repo content from {repo_url}
+        Step 2: Then research similar projects and best practices
+        Step 3: Compare the actual repo with best practices
         """,
         agent=researcher,
-        output_file="research_output_hindi.md"
+        expected_output="Detailed analysis of the actual repo + comparison with best practices"
+    )
+    agent=researcher,
+    output_file="research_output_hindi.md"
     )
 
     # 2. Writing Task: Writer agent (Hindi report banayega)
