@@ -10,33 +10,34 @@ llm = ChatGroq(
 
 # Tools (Tavily + GitHub Reader)
 from crewai_tools import TavilySearchTool
-from .tools import ReadGitHubReadmeTool
-
 tavily_tool = TavilySearchTool()
+
+# GitHub Tool Import
+from app.tools import ReadGitHubReadmeTool
 github_reader = ReadGitHubReadmeTool()
 
 # Agents
 researcher = Agent(
     role="Senior Researcher",
-    goal="GitHub प्रोजेक्ट के बारे में प्रासंगिक जानकारी खोजें और वास्तविक README सामग्री विश्लेषित करें",
-    backstory="10+ वर्षों के अनुभव वाले वेब शोधकर्ता जो पहले वास्तविक रेपो सामग्री पढ़ते हैं",
-    tools=[github_reader, tavily_tool],
+    goal="Analyze the actual GitHub repo content AND find similar projects",
+    backstory="Expert who reads repo content first, then researches",
+    tools=[tavily_tool, github_reader],  # ✅ Both tools
     llm=llm,
     verbose=True
 )
 
 writer = Agent(
     role="Content Writer",
-    goal="प्रोजेक्ट में सुधार के लिए स्पष्ट और क्रियाशील सुझाव हिंदी में लिखें",
-    backstory="आप हिंदी में विस्तृत, उपयोगी और आसानी से समझने वाले सुझाव देते हैं",
+    goal="सुझाव हिंदी में दें",
+    backstory="आप हिंदी में स्पष्ट और क्रियाशील सुझाव लिखते हैं",
     llm=llm,
     verbose=True
 )
 
 reviewer = Agent(
     role="Quality Reviewer",
-    goal="सुझावों को तथ्यों के खिलाफ सत्यापित करें और हिंदी में प्रतिक्रिया दें",
-    backstory="आप सटीकता, प्रासंगिकता और हिंदी में स्पष्टता सुनिश्चित करते हैं",
+    goal="Validate suggestions against facts",
+    backstory="Ensures accuracy and relevance",
     llm=llm,
     verbose=True
 )
