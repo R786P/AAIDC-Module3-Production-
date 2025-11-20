@@ -15,9 +15,9 @@ tavily_tool = TavilySearchTool()
 # Agents
 researcher = Agent(
     role="Senior Researcher",
-    goal="GitHub प्रोजेक्ट के बारे में प्रासंगिक जानकारी खोजें",
-    backstory="10+ वर्षों के अनुभव वाले वेब शोधकर्ता",
-    tools=[tavily_tool],
+    goal="Analyze the actual GitHub repo content AND find similar projects",
+    backstory="Expert who reads repo content first, then researches",
+    tools=[tavily_tool, read_github_readme],  # Both tools
     llm=llm,
     verbose=True
 )
