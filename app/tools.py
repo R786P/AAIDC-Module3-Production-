@@ -1,10 +1,10 @@
 import requests
 from urllib.parse import urlparse
-from crewai_tools import BaseTool
+from crewai_tools import Tool  # ✅ Sahi import
 
-class ReadGitHubReadmeTool(BaseTool):
-    name: str = "Read GitHub README"
-    description: str = "Read the README.md content of a GitHub repository"
+class ReadGitHubReadmeTool(Tool):
+    name = "Read GitHub README"
+    description = "Fetches the README.md content of a GitHub repository"
 
     def _run(self, repo_url: str) -> str:
         """GitHub repo se README.md content fetch karein"""
