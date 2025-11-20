@@ -8,4 +8,4 @@ jinja2
 python-dotenv
 fastapi
 uvicorn
-crewai-tools  
+crewai-tools>=0.3.0  
