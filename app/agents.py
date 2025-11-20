@@ -8,17 +8,19 @@ llm = ChatGroq(
     model="llama3-8b-8192"
 )
 
-# Tools (Tavily - free web search)
+# Tools (Tavily + GitHub Reader)
 from crewai_tools import TavilySearchTool
+from .tools import ReadGitHubReadmeTool
+
 tavily_tool = TavilySearchTool()
+github_reader = ReadGitHubReadmeTool()
 
 # Agents
-from .tools import read_github_readme  # New tool
 researcher = Agent(
     role="Senior Researcher",
-    goal="Analyze the actual GitHub repo content AND find similar projects",
-    backstory="Expert who reads repo content first, then researches",
-    tools=[tavily_tool, read_github_readme],  # Both tools
+    goal="GitHub प्रोजेक्ट के बारे में प्रासंगिक जानकारी खोजें और वास्तविक README सामग्री विश्लेषित करें",
+    backstory="10+ वर्षों के अनुभव वाले वेब शोधकर्ता जो पहले वास्तविक रेपो सामग्री पढ़ते हैं",
+    tools=[github_reader, tavily_tool],
     llm=llm,
     verbose=True
 )
