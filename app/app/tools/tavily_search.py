@@ -1,7 +1,7 @@
 # app/tools/tavily_search.py
-
+from crewai_tools import Tool
 import os
-from langchain_community.tools.base import BaseTool # FIX: Ab BaseTool ko langchain_community se import karein
+from langchain_community.tools.
 from tavily import TavilyClient
 
 # --- Environment Check (TAVILY_API_KEY) ---
