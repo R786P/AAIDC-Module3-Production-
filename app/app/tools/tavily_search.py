@@ -1,59 +1,46 @@
-# app/tools/tavily_search.py
-from crewai_tools import Tool
-from langchain_community.tools.
-from tavily import TavilyClient
 import os
-# --- Environment Check (TAVILY_API_KEY) ---
+# FIX: 'crewai_tools' ki jagah ab hum 'langchain_core' se BaseTool lenge
+from langchain_core.tools import BaseTool 
+from tavily import TavilyClient
+from pydantic import PrivateAttr
+
+# Check API Key
 if 'TAVILY_API_KEY' not in os.environ:
-    # यह चेक यहीं पर रहेगा
     raise ValueError("TAVILY_API_KEY environment variable not set.")
 
-class TavilySearchResults : # FIX: Tool ko BaseTool se badla gaya
-    """A tool that uses the Tavily Search API to find information."""
+class TavilySearchResults(BaseTool):
+    """
+    A custom tool that uses the Tavily Search API.
+    Inherits from LangChain's BaseTool to be compatible with CrewAI.
+    """
     
-    # Tool properties
     name: str = "Tavily Search"
     description: str = (
-        "Useful for searching the internet about current events, code dependencies, "
-        "or latest industry practices. Input should be a single search query string."
+        "Search the web for current information, code documentation, "
+        "or recent events. Input should be a search query string."
     )
     
-    # Private client instance
-    _client: TavilyClient = None
+    # Private attribute for the client (Pydantic v2 compatible)
+    _client: TavilyClient = PrivateAttr()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # Initialize client lazily or immediately
         self._client = TavilyClient(api_key=os.environ.get("TAVILY_API_KEY"))
 
     def _run(self, query: str) -> str:
-        """
-        Search the internet using Tavily.
-        
-        Args:
-            query: The search query string.
-        
-        Returns:
-            A string containing the summarized search results.
-        """
-        # Tavily search logic
         try:
+            # Perform the search
             results = self._client.search(query=query, search_depth="advanced", max_results=5)
             
+            # Format the results
             context = []
             for result in results.get("results", []):
-                # Only include the snippet and source title
-                context.append(f"Source: {result.get('title')}, Snippet: {result.get('content')}")
+                context.append(f"Source: {result.get('title')} ({result.get('url')})\nSnippet: {result.get('content')}")
             
             if not context:
-                return "No useful search results found for the query."
+                return "No relevant search results found."
                 
-            return "\n---\n".join(context)
-
+            return "\n\n---\n\n".join(context)
+            
         except Exception as e:
-            return f"Error during Tavily search: {e}"
-
-# --- Instance Creation (optional, for direct use in other modules) ---
-# Note: Since this is imported via 'from app.tools.tavily_search import TavilySearchResults',
-# this instance might not be strictly needed, but included for completeness if used directly.
-# tavily_search_tool = TavilySearchResults(name="Tavily Search")
+            return f"Error performing search: {str(e)}"
