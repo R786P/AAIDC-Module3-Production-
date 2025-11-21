@@ -1,43 +1,50 @@
-from app.tools import ReadGitHubReadmeTool
+from crewai import Agent
 from langchain_groq import ChatGroq
+# सही Import: TavilySearchResults को import करें
+from app.tools.tavily_search import TavilySearchResults
 import os
 
-# LLM Setup (Groq - Free)
-llm = ChatGroq(
-    api_key=os.getenv("GROQ_API_KEY"),
-    model="llama3-8b-8192"
+# --- LLM CONFIGURATION ---
+if 'GROQ_API_KEY' not in os.environ:
+    raise ValueError("GROQ_API_KEY environment variable not set.")
+
+groq_llm = ChatGroq(
+    temperature=0.6,
+    model="llama2-70b-4096",
 )
 
-# Tools (Tavily + GitHub Reader)
-from crewai_tools import TavilySearchTool
-tavily_tool = TavilySearchTool()
+# --- TOOL INSTANTIATION ---
+tavily_search_tool = TavilySearchResults(name="Tavily Search")
 
-# GitHub Tool Import
-from app.tools import ReadGitHubReadmeTool
-github_reader = ReadGitHubReadmeTool()
-
-# Agents
+# --- AGENT DEFINITIONS ---
 researcher = Agent(
-    role="Senior Researcher",
-    goal="Analyze the actual GitHub repo content AND find similar projects",
-    backstory="Expert who reads repo content first, then researches",
-    tools=[tavily_tool, github_reader],  # ✅ Both tools
-    llm=llm,
-    verbose=True
+    role='Elite Senior Software Analyst',
+    goal='Provide verified, actionable suggestions for the project.',
+    backstory=(
+        "You are a leading expert in software architecture. "
+        "Always maintain a professional tone. "
+        "You MUST use the Tavily Search Tool to verify dependencies."
+    ),
+    llm=groq_llm,
+    tools=[tavily_search_tool], 
+    verbose=True,
+    allow_delegation=False
 )
 
 writer = Agent(
-    role="Content Writer",
-    goal="सुझाव हिंदी में दें",
-    backstory="आप हिंदी में स्पष्ट और क्रियाशील सुझाव लिखते हैं",
-    llm=llm,
-    verbose=True
+    role='Professional Technical Writer',
+    goal='Format analysis into a professional markdown report.',
+    backstory="You are an expert technical writer.",
+    llm=groq_llm,
+    verbose=True,
+    allow_delegation=False
 )
 
 reviewer = Agent(
-    role="Quality Reviewer",
-    goal="Validate suggestions against facts",
-    backstory="Ensures accuracy and relevance",
-    llm=llm,
-    verbose=True
+    role='Quality Assurance Specialist',
+    goal='Review the final report for accuracy.',
+    backstory="You are a meticulous QA specialist.",
+    llm=groq_llm,
+    verbose=True,
+    allow_delegation=False
 )
