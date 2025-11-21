@@ -2,7 +2,7 @@ import os
 from langchain_core.tools import BaseTool 
 from tavily import TavilyClient
 from pydantic import PrivateAttr
-
+from app.tavily_search import TavilySearchResults
 if 'TAVILY_API_KEY' not in os.environ:
     raise ValueError("TAVILY_API_KEY environment variable not set.")
 
