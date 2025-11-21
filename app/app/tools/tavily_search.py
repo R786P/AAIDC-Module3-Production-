@@ -8,7 +8,7 @@ if 'TAVILY_API_KEY' not in os.environ:
     # यह चेक यहीं पर रहेगा
     raise ValueError("TAVILY_API_KEY environment variable not set.")
 
-class TavilySearchResults(BaseTool): # FIX: Tool ko BaseTool se badla gaya
+class TavilySearchResults : # FIX: Tool ko BaseTool se badla gaya
     """A tool that uses the Tavily Search API to find information."""
     
     # Tool properties
